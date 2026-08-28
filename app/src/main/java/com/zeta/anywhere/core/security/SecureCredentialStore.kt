@@ -6,6 +6,7 @@ import androidx.security.crypto.MasterKey
 import com.zeta.anywhere.domain.models.AuthCredentials
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 private const val KEY_STORE = "zeta_anywhere_secure_store"
 private const val KEY_DATA = "auth_credentials"
@@ -20,31 +21,31 @@ class SecureCredentialStore(context: Context) : CredentialStore {
     )
 
     override suspend fun save(credentials: AuthCredentials) = withContext(Dispatchers.IO) {
-        val payload = listOf(
-            credentials.zetaId,
-            credentials.deviceId,
-            credentials.accessToken,
-            credentials.refreshToken.orEmpty(),
-            credentials.expiresAtEpochSeconds.toString(),
-            credentials.endpoint
-        ).joinToString("||")
+        val payload = JSONObject()
+            .put("zeta_id", credentials.zetaId)
+            .put("device_id", credentials.deviceId)
+            .put("access_token", credentials.accessToken)
+            .put("refresh_token", credentials.refreshToken)
+            .put("expires_at", credentials.expiresAtEpochSeconds)
+            .put("endpoint", credentials.endpoint)
+            .toString()
 
         prefs.edit().putString(KEY_DATA, payload).apply()
     }
 
     override suspend fun load(): AuthCredentials? = withContext(Dispatchers.IO) {
         val payload = prefs.getString(KEY_DATA, null) ?: return@withContext null
-        val parts = payload.split("||")
-        if (parts.size < 6) return@withContext null
-
-        AuthCredentials(
-            zetaId = parts[0],
-            deviceId = parts[1],
-            accessToken = parts[2],
-            refreshToken = parts[3].ifBlank { null },
-            expiresAtEpochSeconds = parts[4].toLongOrNull() ?: return@withContext null,
-            endpoint = parts[5]
-        )
+        runCatching {
+            val obj = JSONObject(payload)
+            AuthCredentials(
+                zetaId = obj.getString("zeta_id"),
+                deviceId = obj.getString("device_id"),
+                accessToken = obj.getString("access_token"),
+                refreshToken = obj.optString("refresh_token", null),
+                expiresAtEpochSeconds = obj.getLong("expires_at"),
+                endpoint = obj.getString("endpoint")
+            )
+        }.getOrNull()
     }
 
     override suspend fun clear() = withContext(Dispatchers.IO) {

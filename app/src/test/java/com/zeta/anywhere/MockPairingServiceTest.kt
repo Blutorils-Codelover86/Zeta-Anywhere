@@ -24,8 +24,8 @@ class MockPairingServiceTest {
 
     @Test
     fun `expired code fails`() = runTest {
-        val outcome = service.pair("ZETA-EXPIRED-0001", "Android Phone")
-        assertTrue(outcome is PairingOutcome.InvalidCode || outcome is PairingOutcome.ExpiredCode)
+        val outcome = service.pair("ZETA-EXPR-0001", "Android Phone")
+        assertTrue(outcome is PairingOutcome.ExpiredCode)
     }
 
     @Test
@@ -36,8 +36,8 @@ class MockPairingServiceTest {
     }
 
     @Test
-    fun `network fail code fails`() = runTest {
-        val outcome = service.pair("ZETA-NETF-AIL0", "Android Phone")
-        assertTrue(outcome is PairingOutcome.NetworkFailure || outcome is PairingOutcome.InvalidCode)
+    fun `network failure scenario`() = runTest {
+        val outcome = service.pair("ZETA-NETF-0001", "Android Phone")
+        assertTrue(outcome is PairingOutcome.NetworkFailure)
     }
 }

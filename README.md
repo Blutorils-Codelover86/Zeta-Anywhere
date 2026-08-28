@@ -65,9 +65,9 @@ Mock mode simulates:
 
 - Valid: `ZETA-7K9P-X4M2`
 - Invalid: `INVALID-CODE`
-- Used: `ZETA-USED-A1B2`
-- Expired: `ZETA-EXPIRED-A1`
-- Network fail simulation: include `NETFAIL` in a valid code slot when extending mock
+- Used scenario: `ZETA-USED-0001`
+- Expired scenario: `ZETA-EXPR-0001`
+- Network failure scenario: `ZETA-NETF-0001`
 
 ## Testing
 

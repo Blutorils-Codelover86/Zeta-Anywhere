@@ -4,7 +4,6 @@ import com.zeta.anywhere.data.services.PairingService
 import com.zeta.anywhere.domain.models.AuthCredentials
 import com.zeta.anywhere.domain.models.PairingOutcome
 import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.seconds
 
 class MockPairingService(private val pairingTtlSeconds: Int) : PairingService {
     private val consumedCodes = mutableSetOf<String>()
@@ -12,28 +11,29 @@ class MockPairingService(private val pairingTtlSeconds: Int) : PairingService {
     override suspend fun pair(pairingCode: String, deviceName: String, deviceType: String): PairingOutcome {
         delay(1200)
 
-        if (!PAIRING_REGEX.matches(pairingCode)) {
+        val normalized = pairingCode.trim().uppercase()
+        if (!PAIRING_REGEX.matches(normalized)) {
             return PairingOutcome.InvalidCode
         }
-        if ("EXPIRED" in pairingCode) {
-            return PairingOutcome.ExpiredCode
-        }
-        if ("NETFAIL" in pairingCode) {
-            return PairingOutcome.NetworkFailure
-        }
-        if (pairingCode in consumedCodes || "USED" in pairingCode) {
+
+        val scenario = normalized.substringAfter("ZETA-").substringBefore("-")
+        if (scenario == "EXPR") return PairingOutcome.ExpiredCode
+        if (scenario == "NETF") return PairingOutcome.NetworkFailure
+        if (scenario == "USED") return PairingOutcome.AlreadyUsedCode
+
+        if (normalized in consumedCodes) {
             return PairingOutcome.AlreadyUsedCode
         }
 
-        consumedCodes += pairingCode
+        consumedCodes += normalized
         val now = System.currentTimeMillis() / 1000
 
         return PairingOutcome.Success(
             credentials = AuthCredentials(
                 zetaId = "zeta_abc123",
                 deviceId = "android_device_${deviceName.hashCode()}",
-                accessToken = "mock_access_${pairingCode.takeLast(4)}",
-                refreshToken = "mock_refresh_${pairingCode.takeLast(4)}",
+                accessToken = "mock_access_${normalized.takeLast(4)}",
+                refreshToken = "mock_refresh_${normalized.takeLast(4)}",
                 expiresAtEpochSeconds = now + pairingTtlSeconds,
                 endpoint = "https://mock.zeta.anywhere"
             ),

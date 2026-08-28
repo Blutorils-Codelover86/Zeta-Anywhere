@@ -48,5 +48,15 @@ class MockCallService : CallService {
         _callState.value = CallState.Idle
     }
 
+    suspend fun simulateTimeout() {
+        _callState.value = CallState.Timeout
+        delay(400)
+        _callState.value = CallState.Idle
+    }
+
+    suspend fun simulateFailure() {
+        _callState.value = CallState.Failed("Couldn't connect the call.")
+    }
+
     private fun newCallId(): String = "call_${System.currentTimeMillis()}"
 }

@@ -25,7 +25,7 @@ class MockConnectionService : ConnectionService {
     }
 
     override suspend fun refreshSession() {
-        if (_connectionState.value == ConnectionStatus.ZETA_OFFLINE) return
+        if (_connectionState.value == ConnectionStatus.AUTHENTICATION_FAILED) return
         _connectionState.value = ConnectionStatus.CONNECTING
         delay(400)
         _connectionState.value = ConnectionStatus.ZETA_ONLINE
@@ -33,5 +33,13 @@ class MockConnectionService : ConnectionService {
 
     override suspend fun setZetaOnline(online: Boolean) {
         _connectionState.value = if (online) ConnectionStatus.ZETA_ONLINE else ConnectionStatus.ZETA_OFFLINE
+    }
+
+    suspend fun simulateAuthenticationFailure() {
+        _connectionState.value = ConnectionStatus.AUTHENTICATION_FAILED
+    }
+
+    suspend fun simulateConnectionLost() {
+        _connectionState.value = ConnectionStatus.NETWORK_ERROR
     }
 }

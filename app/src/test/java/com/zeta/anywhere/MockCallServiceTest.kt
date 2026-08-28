@@ -26,6 +26,18 @@ class MockCallServiceTest {
     }
 
     @Test
+    fun `call timeout scenario`() = runTest {
+        service.simulateTimeout()
+        assertTrue(service.callState.value is CallState.Idle)
+    }
+
+    @Test
+    fun `call failure scenario`() = runTest {
+        service.simulateFailure()
+        assertTrue(service.callState.value is CallState.Failed)
+    }
+
+    @Test
     fun `outgoing call can end`() = runTest {
         service.startOutgoingCall()
         assertTrue(service.callState.value is CallState.Connected)

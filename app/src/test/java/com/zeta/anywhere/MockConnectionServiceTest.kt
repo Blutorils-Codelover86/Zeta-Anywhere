@@ -24,6 +24,20 @@ class MockConnectionServiceTest {
     }
 
     @Test
+    fun `authentication failure simulation works`() = runTest {
+        service.simulateAuthenticationFailure()
+        assertEquals(ConnectionStatus.AUTHENTICATION_FAILED, service.connectionState.value)
+    }
+
+    @Test
+    fun `connection lost and reconnect`() = runTest {
+        service.simulateConnectionLost()
+        assertEquals(ConnectionStatus.NETWORK_ERROR, service.connectionState.value)
+        service.refreshSession()
+        assertEquals(ConnectionStatus.ZETA_ONLINE, service.connectionState.value)
+    }
+
+    @Test
     fun `disconnect resets state`() = runTest {
         service.connect(dummyCredentials())
         service.disconnect()
