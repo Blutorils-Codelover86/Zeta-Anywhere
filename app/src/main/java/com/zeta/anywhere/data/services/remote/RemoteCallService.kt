@@ -16,7 +16,11 @@ class RemoteCallService(@Suppress("UNUSED_PARAMETER") private val config: AppCon
     }
 
     override suspend fun simulateIncomingCall() {
-        // no-op in remote mode; FCM + backend call session retrieval will trigger this.
+        // no-op in remote mode; this is for development only.
+    }
+
+    override suspend fun receiveIncomingCall(callId: String) {
+        _callState.value = CallState.Incoming(callId = callId)
     }
 
     override suspend fun answerCall() {

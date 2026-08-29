@@ -24,6 +24,10 @@ class MockCallService : CallService {
         _callState.value = CallState.Incoming(newCallId())
     }
 
+    override suspend fun receiveIncomingCall(callId: String) {
+        _callState.value = CallState.Incoming(callId = callId)
+    }
+
     override suspend fun answerCall() {
         val current = _callState.value
         if (current is CallState.Incoming) {

@@ -86,3 +86,8 @@ Run unit tests:
 ## Integration contract
 
 See [`docs/integration.md`](docs/integration.md) for future Zeta desktop/backend API requirements.
+
+
+## Notification contract readiness
+
+Incoming-call payload parsing is isolated in `IncomingCallPayloadParser` and routed through `IncomingCallDispatcher` so FCM integration can forward payload maps without UI coupling.

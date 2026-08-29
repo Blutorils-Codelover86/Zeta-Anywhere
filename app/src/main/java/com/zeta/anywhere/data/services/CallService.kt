@@ -8,6 +8,7 @@ interface CallService {
 
     suspend fun startOutgoingCall()
     suspend fun simulateIncomingCall()
+    suspend fun receiveIncomingCall(callId: String)
     suspend fun answerCall()
     suspend fun declineCall()
     suspend fun endCall()

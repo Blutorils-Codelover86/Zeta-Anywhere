@@ -13,7 +13,7 @@ object ApiClient {
             val connection = URL(url).openConnection() as HttpURLConnection
             connection.requestMethod = "POST"
             connection.setRequestProperty("Content-Type", "application/json")
-            accessToken?.let { connection.setRequestProperty("Authorization", "******") }
+            accessToken?.let { token -> connection.setRequestProperty("Authorization", "Bearer " + token) }
             connection.doOutput = true
 
             OutputStreamWriter(connection.outputStream).use { writer ->
